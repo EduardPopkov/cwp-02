@@ -8,8 +8,10 @@ const server = net.createServer((client) => {
   client.setEncoding('utf8');
 
   client.on('data', (data) => {
-    console.log(data + ': client' + i);
-    client.write('Hello i server');
+    if(data == 'QA'){
+      client.write('ACK');
+    }
+    //client.write('Hello i server');
   });
 });
 
