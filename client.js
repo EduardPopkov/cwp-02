@@ -4,11 +4,11 @@ const port = 8124;
 
 //var arrQues = [];
 
-var rigth = 0;
+var right = 0;
 var quest;
-
-
+var count = 0;
 var arrQuestion = [];
+var clientCount;
 
 const client = new net.Socket();
 
@@ -25,34 +25,39 @@ client.connect(port, function () {
     arrQuestion.push(quest);
   });
   arrQuestion.pop();
-
-
-
-
-
-  //client.write('DEC');
 });
 
 client.on('data', function (data) {
-  console.log('data: ' + data);
-  if(data == 'ACK'){
+  if(data.indexOf('ASK') == 0){
+    clientCount = data.substring(3);
     console.log('----------start test----------');
 
     sendMessageToServer(client, arrQuestion);
   }
   else if(data == 'DEC'){
-    console.log(data);
     client.destroy();
   }
   else if(data.indexOf('answer') == 0){
     let answer = data.substring(6);
+    console.log('Вопрос: ' + quest + ' ' + 'Ответ: ' + answer);
+    count = count + 1;
+
+    fs.appendFileSync('config' + clientCount + '.txt', 'Вопрос: ' + quest + ' ' + 'Ответ: ' + answer + '\n');
+
     for(let i = 0; i < arrQuestion.length; i++){
       if(arrQuestion[i].ask == quest && arrQuestion[i].answer == answer){
-        console.log('OK');
+        right = right + 1;;
       }
     }
 
-    client.destroy();
+    if(count != arrQuestion.length){
+      sendMessageToServer(client, arrQuestion);
+    }
+    else{
+      fs.appendFileSync('config' + clientCount + '.txt', 'Количество правильных ответов: ' + right);
+      console.log('Количество правильных ответов: ' + right);
+      client.destroy();
+    }
   }
   /*
   else if(Array.isArray([])){
@@ -99,10 +104,9 @@ function sendQA(client) {
 };
 
 function sendMessageToServer(client, arrQuestion) {
-  //let arrQuestion = [];
   console.log('func: sendMessageToServer');
 
-  console.log(arrQuestion);
+  //console.log(arrQuestion);
 
   arrQuestion.sort(compareRandom);
   max = arrQuestion.length;

@@ -8,7 +8,7 @@ var arrQuestion = [];
 var ar = [];
 
 const server = net.createServer((client) => {
-  console.log('Connected client: ' + (++i));
+  console.log('--------------- Connected client: ' + (++i) + ' ---------------');
   client.setEncoding('utf8');
 
   var formJSON = fs.readFileSync('./qa.json', 'utf8');
@@ -20,15 +20,14 @@ const server = net.createServer((client) => {
   arrQuestion.pop();
 
   client.on('data', (data) => {
-    console.log('data: ' + data);
     if(data == 'QA'){
-      client.write('ACK');
+      client.write('ASK' + i.toString());
     }
     else if(data == 'DEC') {
       client.write('DEC');
     }
     else if(data.indexOf('ask') == 0){
-      console.log(data.substring(3));
+      //console.log(data.substring(3));
 
       arrQuestion.sort(compareRandom);
       max = arrQuestion.length;
@@ -36,6 +35,7 @@ const server = net.createServer((client) => {
       var rand = max * Math.random();
       rand = Math.floor(rand);
 
+      console.log('Вопрос: ' + data.substring(3) + ' ' + 'Ответ: ' + arrQuestion[rand].answer);
       client.write('answer' + arrQuestion[rand].answer);
     }
   });
