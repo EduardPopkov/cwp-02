@@ -1,8 +1,10 @@
 const fs = require('fs');
 const net = require('net');
+const exec = require('child_process');
+const clientSwarm = require('./client-swarm.js');
 const port = 8124;
 
-//var arrQues = [];
+clientSwarm(process.argv[2]);
 
 var right = 0;
 var quest;
@@ -11,7 +13,6 @@ var arrQuestion = [];
 var clientCount;
 
 const client = new net.Socket();
-
 client.setEncoding('utf8');
 
 client.connect(port, function () {
@@ -25,6 +26,11 @@ client.connect(port, function () {
     arrQuestion.push(quest);
   });
   arrQuestion.pop();
+});
+
+client.on (' exit ', function (code, signal) {
+  console.log (`«дочерний процесс завершен с« + »
+              кодом ${code} и сигналом ${signal}`);
 });
 
 client.on('data', function (data) {
@@ -59,44 +65,7 @@ client.on('data', function (data) {
       client.destroy();
     }
   }
-  /*
-  else if(Array.isArray([])){
-    console.log('before' + count);
-
-    count = count + 1;
-
-    console.log('after' + count);
-
-    console.log('вопрос: ' + q + ' ' + 'Ответ: ' + data);
-
-    var str = fs.readFileSync('./qa.json', 'utf8');
-    //console.log(str);
-    var newStr = JSON.parse(str, function (ask, answer) {
-      var quest = new question(ask, answer);
-      arrAnswers.push(quest);
-    });
-
-    for(var i = 0; i < arrAnswers.length; i++){
-
-      if(arrAnswers[i].ask == q && arrAnswers[i].answer == data){
-        rigth++;
-      }
-    }
-
-
-    console.log('Кол правильных ответов: ' + rigth);
-
-    if(count == 2){
-      client.destroy();
-    }
-  }
-  else{
-
-  }
-  */
 });
-
-
 
 function sendQA(client) {
   console.log('func: sendQA');
@@ -128,6 +97,10 @@ var question = function(ask, answer) {
 function compareRandom(){
   return Math.random() - 0.5;
 };
+
+client.on('exit', function (code) {
+  console.log('-----------------------' + code);
+});
 
 client.on('close', function () {
   console.log('Connection closed');
