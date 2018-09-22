@@ -28,11 +28,6 @@ client.connect(port, function () {
   arrQuestion.pop();
 });
 
-client.on (' exit ', function (code, signal) {
-  console.log (`«дочерний процесс завершен с« + »
-              кодом ${code} и сигналом ${signal}`);
-});
-
 client.on('data', function (data) {
   if(data.indexOf('ASK') == 0){
     clientCount = data.substring(3);
@@ -97,10 +92,6 @@ var question = function(ask, answer) {
 function compareRandom(){
   return Math.random() - 0.5;
 };
-
-client.on('exit', function (code) {
-  console.log('-----------------------' + code);
-});
 
 client.on('close', function () {
   console.log('Connection closed');
